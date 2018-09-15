@@ -6,9 +6,9 @@ NAME	= read
 
 HEADERS	= ./includes ./libft/includes
 
-SOURCES	= ./srcs/main.c			./srcs/sh_read.c		./srcs/env/sh_env_init.c		\
-	./srcs/env/sh_env_validkey.c	./srcs/env/sh_env_get.c		./srcs/env/sh_env_set.c			\
-	./srcs/env/sh_env_del.c		
+SOURCES	= ./srcs/sh_read_helper.c		./srcs/main.c			./srcs/sh_read.c			\
+	./srcs/env/sh_env_init.c	./srcs/env/sh_env_validkey.c	./srcs/env/sh_env_get.c			\
+	./srcs/env/sh_env_set.c		./srcs/env/sh_env_del.c		
 
 OBJ	= $(SOURCES:.c=.o)
 

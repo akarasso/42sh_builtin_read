@@ -25,6 +25,7 @@ typedef struct	s_cmd
 }				t_cmd;
 
 int		sh_read(t_cmd *cmd);
+char	**sh_read_get_split_val(int flag);
 
 /*
 ** ENV
@@ -38,5 +39,6 @@ t_env	*sh_env_init(char **env);
 void	sh_env_deconstructor(t_env *env);
 int		sh_env_set(char	***tab, char *key, char *value, char flag);
 int		sh_env_validkey(char *s);
+int		sh_env_set_protected(t_env *env, char *key, char *value);
 
 #endif

@@ -1,69 +1,75 @@
 #include "read.h"
 
-int		read_flag(t_cmd *cmd, int *flag)
+static int	read_flag(int argc, char ***argv, int *flag)
 {
 	int i;
 
 	*flag = 0;
-	if (argc > 1 && argv[1][0] == '-')
+	if (argc > 1 && (**argv)[0] == '-' && (**argv)[1])
 	{
 		i = 1;
-		while (argv[1][i])
+		while ((**argv)[i])
 		{
-			if (argv[1][i] != 'r')
+			if ((**argv)[i] != 'r')
 				return (0);
 			*flag = 1;
 			i++;
 		}
 	}
+	if (*flag)
+		(*argv)++;
 	return (1);
 }
 
-static void read_clear_str(char *str)
+static void	read_assign(t_cmd *cmd, char **argv, char **tab)
 {
-	while (*str)
-	{
-		if (!ft_isprint(*str) || *str == '\t') {
-			*str = ' ';
-		}
-		str++;
-	}
-}
+	char *tmp;
 
-static char	**get_split_val(int flag)
-{
-	char **tab;
-	char *res;
-	char *line;
-
-	line = 0;
-	res = 0;
-	get_next_line(0, &res);
-	if (!flag)
+	while (*argv && *tab)
 	{
-		while (get_next_line(0, &line) > 0)
+		if (!*(argv + 1))
 		{
-			res = ft_3strjoinfree(res, line, "\n", LEFT);
-			ft_strdel(&line);
+			tmp = ft_strtab_join(tab, " ");
+			sh_env_set_protected(cmd->env, *argv, tmp);
+			ft_strdel(&tmp);
 		}
+		else
+			sh_env_set_protected(cmd->env, *argv, *tab);
+		tab++;
+		argv++;
 	}
-	read_clear_str(res);
-	tab = (!flag) ? ft_strsplit(res, ' ') : ft_strsplit(res, ' ');
-	free(res);
-	return (tab)
 }
 
-int		sh_read(t_cmd *cmd)
+static int	check_key(char **argv)
+{
+	while (*argv)
+	{
+		if (!sh_env_validkey(*argv))
+		{
+			ft_putstr("42sh: read: '");
+			ft_putstr(*argv);
+			ft_putendl("' identifiant non valable");
+			return (0);
+		}
+		argv++;
+	}
+	return (1);
+}
+
+int			sh_read(t_cmd *cmd)
 {
 	int 	flag;
 	char	**tab;
+	char	**argv;
 
-	if (!read_flag(cmd, &flag))
-	{
-		printf("COMMAND ERROR FLAG\n");
+	argv = &cmd->argv[1];
+	if (!read_flag(cmd->argc, &argv, &flag) || !check_key(argv))
 		return (CMD_ERROR);
-	}
-	tab = get_split_val(flag);
-
+	tab = sh_read_get_split_val(flag);
+	if (*argv)
+		read_assign(cmd, argv, tab);
+	else
+		sh_env_set_protected(cmd->env, "REPLY", ft_strtab_join(tab, " "));
+	ft_strtab_del(&tab);
 	return (CMD_SUCCESS);
 }

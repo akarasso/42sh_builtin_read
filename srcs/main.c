@@ -11,5 +11,7 @@ int main(int argc, char **argv, char **ienv)
 	cmd.argc = argc;
 	cmd.env = env;
 	sh_read(&cmd);
+	ft_strtab_del(&cmd.argv);
+	sh_env_deconstructor(env);
 	return (0);
 }
